@@ -7,7 +7,7 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcST4I6PixzJfHfDxc0rKrWLzJN7YVo3RfhTCA&s');
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyIB3QeXGbH7WTnj3_pOEP22vQq1leg4Gxdg&s');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -31,15 +31,20 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="dashboard-header text-center">
-            <h1 class="text-success">Welcome, <%= user.username %>!</h1>
-            <div class="text-warning">Current Wallet Balance:<%= user.balance %></div>
-            <div class="text-warning">Invested Amount:<%= user.investedAmount %></div>
-            <div class="text-warning">Current Amount:<%= user.currentAmount %></div>
-
+     <!-- Navigation Menu -->
+     <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a> <!-- Link to Profile Page -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/logout">Logout</a> <!-- Link to Logout Page -->
+                </li>
+            </ul>
         </div>
-        
+    </nav>
+    <div class="container mt-5">   
         <div class="card dashboard-card">
             <div class="card-body">
                 <h3 class="card-title">Share Dashboard</h3>
@@ -87,8 +92,8 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${share.name}</td>
-                <td>$${share.todayPrice}</td>
-                <td>$${share.todayHigh}</td>
+                <td>INR ${share.todayPrice}</td>
+                <td>INR ${share.todayHigh}</td>
                 <td class="price-change ${change > 0 ? 'gain' : 'loss'}">
                     ${change > 0 ? '+' : ''}${change.toFixed(2)}
                 </td>

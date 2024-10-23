@@ -6,12 +6,27 @@
     <title>Speed Trading</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+          .spinner {
+            display: none; /* Initially hidden */
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-top: 20px; /* Space above spinner */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         body {
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTyIB3QeXGbH7WTnj3_pOEP22vQq1leg4Gxdg&s'); 
         }
         .order-confirmation-card {
-            background-color: #007bff;
+            background-color: darkblue;
             color: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -38,12 +53,30 @@
     </style>
 </head>
 <body>
+     <!-- Navigation Menu -->
+     <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a> <!-- Link to Profile Page -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/logout">Logout</a> <!-- Link to Logout Page -->
+                </li>
+            </ul>
+        </div>
+    </nav>
+   
     <div class="container">
+       
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card order-confirmation-card">
+                    <div id="spinner" class="spinner"></div>
                     <div class="card-body">
                         <h5 class="card-title">Order Confirmation</h5>
+                        <div id="timer" class="timer"></div>
+                        
                         <div class="form-group">
                             <label for="cryptoName">Name</label>
                             <input type="text" class="form-control" id="cryptoName" value="BTC" disabled>
@@ -114,6 +147,7 @@
 
             const messageElement = document.getElementById('message');
             const expiryTime = parseInt(document.getElementById('expiryTime').value);
+            const spinner = document.getElementById('spinner');
 
             messageElement.className = '';
             messageElement.innerText = '';
@@ -134,7 +168,9 @@
                 await updateInvestedAndCurrentAmount(totalCost);
                 messageElement.className = 'success-message';
                 messageElement.innerText = 'Order successful! Your new balance is ' + userBalance + ' INR.';
-
+                //counter start
+                spinner.style.display = 'block';
+                startCountdown(expiryTime);
                 // Schedule the update to currentAmount after the expiry time
                 setTimeout(async () => {
                     const updatedAmount = totalCost * 1.2;
@@ -142,11 +178,33 @@
                     messageElement.className = 'success-message';
                     messageElement.innerText = 'Amount updated after expiry time! Current amount is now ' + updatedAmount + ' INR.';
                  }, expiryTime * 1000); // Convert seconds to milliseconds
+                  // Hide spinner when timer ends
+                setTimeout(() => {
+                    spinner.style.display = 'none';
+                    window.location.href = '/dashboard';
+                }, expiryTime * 1000);
+                
             } 
             catch (error) {
                 messageElement.className = 'error-message';
                 messageElement.innerText = 'Failed to place the order.';
             }   
+        }
+
+        function startCountdown(seconds) {
+            let remainingTime = seconds;
+
+            const timerDisplay = document.getElementById('timer');
+            
+            const intervalId = setInterval(() => {
+                if (remainingTime <= 0) {
+                    clearInterval(intervalId);
+                    timerDisplay.innerText = "Time's up!";
+                    return;
+                }
+                
+                timerDisplay.innerText = `Time remaining: ${remainingTime--} seconds`;
+            }, 1000);
         }
 
         async function updateCurrentAmount(amount) {
@@ -192,6 +250,7 @@
                 throw error;
             }
         }
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

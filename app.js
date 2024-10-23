@@ -35,6 +35,7 @@ const userRoutes = require('./routes/user');
 const dashboardRoutes = require('./routes/dashboard');
 const speedtradingRoutes=require('./routes/speedtrading');
 const addWalletRoutes = require('./routes/add-wallet');
+const profileRoutes=require('./routes/profile');
 
 // Use Routes
 app.use('/', indexRoutes);
@@ -42,6 +43,7 @@ app.use('/user', userRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/speedtrading',speedtradingRoutes);
 app.use('/add-wallet', addWalletRoutes);
+app.use('/profile',profileRoutes);
 
 // User registration and login routes
 app.get('/register', (req, res) => {
@@ -143,7 +145,7 @@ app.post('/update-investment', auth, async (req, res) => {
 
         // Update the user's balance, investedAmount, and currentAmount
         user.balance = userBalance;
-        user.investedAmount += investedAmount;
+        user.investedAmount = investedAmount;
         user.currentAmount = currentAmount;
 
         // Save the updated user data to MongoDB
