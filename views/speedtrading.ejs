@@ -115,7 +115,7 @@
                             <input type="text" class="form-control" id="totalAmountRequired" value="0" disabled>
                         </div>
                         <div id="message" class="error-message"></div>
-                        <button class="btn btn-custom" onclick="confirmOrder()">Confirm the Order</button>
+                        <button class="btn btn-custom"  onclick="confirmOrder()">Confirm the Order</button>
                     </div>
                 </div>
             </div>
@@ -161,7 +161,7 @@
 
             // Deduct the order amount from the user's balance
             userBalance -= totalCost;
-            document.getElementById('availableBalance').innerText = userBalance + ' USDT';
+            document.getElementById('availableBalance').innerText = userBalance + ' INR';
 
             // Update the backend with the initial investment
             try {
@@ -192,6 +192,8 @@
         }
 
         function startCountdown(seconds) {
+
+           
             let remainingTime = seconds;
 
             const timerDisplay = document.getElementById('timer');
