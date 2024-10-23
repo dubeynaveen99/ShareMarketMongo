@@ -107,12 +107,14 @@
         updateTotalAmount();
         document.getElementById("quantity").addEventListener("change", updateTotalAmount);
 
-        async function confirmOrder() {
+        async function confirmOrder() {      
             const currentPrice = parseFloat(document.getElementById('currentPrice').value);
             const quantity = parseInt(document.getElementById('quantity').value);
             const totalCost = currentPrice * quantity;
 
             const messageElement = document.getElementById('message');
+            const expiryTime = parseInt(document.getElementById('expiryTime').value);
+
             messageElement.className = '';
             messageElement.innerText = '';
 
@@ -125,18 +127,49 @@
 
             // Deduct the order amount from the user's balance
             userBalance -= totalCost;
-            document.getElementById('availableBalance').innerText = userBalance.toFixed(2) + ' USDT';
+            document.getElementById('availableBalance').innerText = userBalance + ' USDT';
 
-            // Update the backend
+            // Update the backend with the initial investment
             try {
                 await updateInvestedAndCurrentAmount(totalCost);
                 messageElement.className = 'success-message';
-                messageElement.innerText = 'Order successful! Your new balance is ' + userBalance.toFixed(2) + ' INR.';
-            } catch (error) {
+                messageElement.innerText = 'Order successful! Your new balance is ' + userBalance + ' INR.';
+
+                // Schedule the update to currentAmount after the expiry time
+                setTimeout(async () => {
+                    const updatedAmount = totalCost * 1.2;
+                    await updateCurrentAmount(updatedAmount);
+                    messageElement.className = 'success-message';
+                    messageElement.innerText = 'Amount updated after expiry time! Current amount is now ' + updatedAmount + ' INR.';
+                 }, expiryTime * 1000); // Convert seconds to milliseconds
+            } 
+            catch (error) {
                 messageElement.className = 'error-message';
                 messageElement.innerText = 'Failed to place the order.';
+            }   
+        }
+
+        async function updateCurrentAmount(amount) {
+            try {
+                const response = await fetch('/update-current-amount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentAmount: amount
+                }),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update current amount');
+            }
+            }
+            catch (error) {
+                console.error('Error:', error);
+                throw error;
             }
         }
+
 
         async function updateInvestedAndCurrentAmount(amount) {
             try {

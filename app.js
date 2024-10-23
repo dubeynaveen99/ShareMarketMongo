@@ -156,6 +156,29 @@ app.post('/update-investment', auth, async (req, res) => {
     }
 });
 
+
+// Update currentAmount route
+app.post('/update-current-amount', auth, async (req, res) => {
+    const { currentAmount } = req.body;
+    const userId = req.user.id; // Authenticated user ID
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Update the currentAmount
+        user.currentAmount = currentAmount;
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Current amount updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Failed to update current amount' });
+    }
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
