@@ -6,6 +6,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs'); // Use bcryptjs for password hashing
 const cookieParser = require('cookie-parser'); // Make sure to require cookie-parser
 const jwt = require('jsonwebtoken'); // Import jsonwebtoken
+const auth = require('./middleware/auth');
 
 dotenv.config();
 
@@ -32,11 +33,15 @@ const User = require('./models/User'); // Ensure this path is correct
 const indexRoutes = require('./routes/index');
 const userRoutes = require('./routes/user');
 const dashboardRoutes = require('./routes/dashboard');
+const speedtradingRoutes=require('./routes/speedtrading');
+const addWalletRoutes = require('./routes/add-wallet');
 
 // Use Routes
 app.use('/', indexRoutes);
 app.use('/user', userRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/speedtrading',speedtradingRoutes);
+app.use('/add-wallet', addWalletRoutes);
 
 // User registration and login routes
 app.get('/register', (req, res) => {
@@ -96,6 +101,35 @@ app.post('/login', async (req, res) => {
         res.render('login', { error: 'Error logging in' });
     }
 });
+
+//balance update logic 
+
+// Handle wallet balance update
+app.post('/add-wallet',auth, async (req, res) => {
+    const { amount } = req.body;
+    const userId = req.user.id; // Authenticated user ID
+
+    if (amount <= 0) {
+        return res.status(400).json({ success: false, message: 'Invalid amount' });
+    }
+
+    try {
+        const user = await User.findById(userId); // Find the user by ID
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Update the user's balance
+        user.balance += amount; // Add the amount to the existing balance
+        await user.save(); // Save the updated user data to MongoDB
+
+        res.status(200).json({ success: true, message: `₹${amount} added successfully` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error adding balance' });
+    }
+});
+
 
 // Start server
 const PORT = process.env.PORT || 3000;

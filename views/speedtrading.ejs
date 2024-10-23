@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speed Trading</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .order-confirmation-card {
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
+            padding: 20px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            width: 100%;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+        .quantity-options button {
+            margin-top: 10px;
+            width: 100px;
+        }
+        .expiry-options button {
+            margin-right: 5px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 5px;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .processing-message {
+            color: blue;
+            margin-top: 10px;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card order-confirmation-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Order Confirmation</h5>
+                        <div class="form-group">
+                            <label for="cryptoName">Name</label>
+                            <input type="text" class="form-control" id="cryptoName" value="BTC" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="direction">Direction</label>
+                            <select class="form-control" id="direction">
+                                <option value="Buy up">Buy up</option>
+                                <option value="Buy down">Buy down</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="currentPrice">Current Price</label>
+                            <input type="text" class="form-control" id="currentPrice" value="57191.58" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Transaction Mode</label>
+                            <span class="badge badge-light text-dark">USDT</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Choose expiry time (slide left for more options)</label>
+                            <div class="expiry-options">
+                                <button class="btn btn-outline-light" onclick="selectExpiry(60)">60S</button>
+                                <button class="btn btn-outline-light" onclick="selectExpiry(120)">120S</button>
+                                <button class="btn btn-outline-light" onclick="selectExpiry(180)">180S</button>
+                                <button class="btn btn-outline-light" onclick="selectExpiry(240)">240S</button>
+                            </div>
+                            <input type="hidden" id="expiryTime" value="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity to buy</label>
+                            <div class="quantity-options">
+                                <button class="btn btn-light" onclick="selectQuantity(1000)">1000</button>
+                                <button class="btn btn-light" onclick="selectQuantity(5000)">5000</button>
+                                <button class="btn btn-light" onclick="selectQuantity(10000)">10000</button>
+                                <button class="btn btn-light" onclick="selectQuantity(50000)">50000</button>
+                            </div>
+                            <input type="text" class="form-control mt-3 input-field" id="quantity" value="1000">
+                        </div>
+                        <div class="form-group">
+                            <label>Available Balance:<%= user.balance %></label>
+                            <span id="availableBalance"></span>
+                        </div>
+                        <div id="message" class="error-message"></div>
+                        <button class="btn btn-custom" onclick="confirmOrder()">Confirm the Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userBalance = 5000; // This should be fetched from the server for the logged-in user
+
+        function selectExpiry(time) {
+            document.getElementById('expiryTime').value = time;
+        }
+
+        function selectQuantity(amount) {
+            document.getElementById('quantity').value = amount;
+        }
+
+        function confirmOrder() {
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const expiryTime = parseInt(document.getElementById('expiryTime').value);
+            const direction = document.getElementById('direction').value;
+            const totalCost = currentPrice * quantity;
+
+            const messageElement = document.getElementById('message');
+            messageElement.className = '';
+            messageElement.innerText = '';
+
+            if (userBalance < totalCost) {
+                // Show error if the balance is insufficient
+                messageElement.className = 'error-message';
+                messageElement.innerText = 'Insufficient balance to place the order.';
+                return;
+            }
+
+            // If balance is sufficient, show processing message
+            messageElement.className = 'processing-message';
+            messageElement.innerText = 'Processing your order...';
+
+            // Deduct the order amount from the user's balance
+            userBalance -= totalCost;
+            document.getElementById('availableBalance').innerText = userBalance + ' USDT';
+
+            setTimeout(() => {
+                // After expiry time, increase balance by 20% of the order amount
+                const incrementAmount = totalCost * 0.2;
+                userBalance += incrementAmount;
+                document.getElementById('availableBalance').innerText = userBalance + ' USDT';
+
+                // Update the balance in the database
+                updateUserBalance(userBalance).then(() => {
+                    // Show success message and navigation option
+                    messageElement.className = 'success-message';
+                    messageElement.innerHTML = 'Order successful! Your new balance is ' + userBalance + ' USDT.<br><button class="btn btn-primary mt-3" onclick="goToDashboard()">Go to Dashboard</button>';
+                });
+            }, expiryTime * 1000);
+        }
+
+        async function updateUserBalance(balance) {
+            try {
+                const response = await fetch('/update-balance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ balance }),
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to update balance');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function goToDashboard() {
+            window.location.href = '/dashboard';
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
