@@ -51,6 +51,7 @@
             margin-top: 10px;
         }
     </style>
+   
 </head>
 <body>
     <div class="container">
@@ -72,7 +73,7 @@
                         </div>
                         <div class="form-group">
                             <label for="currentPrice">Current Price</label>
-                            <input type="text" class="form-control" id="currentPrice" value="57191.58" disabled>
+                            <input type="text" class="form-control" id="currentPrice" value="5700" disabled>
                         </div>
                         <div class="form-group">
                             <label>Transaction Mode</label>
@@ -90,17 +91,15 @@
                         </div>
                         <div class="form-group">
                             <label for="quantity">Quantity to buy</label>
-                            <div class="quantity-options">
-                                <button class="btn btn-light" onclick="selectQuantity(1000)">1000</button>
-                                <button class="btn btn-light" onclick="selectQuantity(5000)">5000</button>
-                                <button class="btn btn-light" onclick="selectQuantity(10000)">10000</button>
-                                <button class="btn btn-light" onclick="selectQuantity(50000)">50000</button>
-                            </div>
                             <input type="text" class="form-control mt-3 input-field" id="quantity" value="1000">
                         </div>
                         <div class="form-group">
                             <label>Available Balance:<%= user.balance %></label>
                             <span id="availableBalance"></span>
+                        </div>
+                        <div class="form-group">
+                            <label>Total Amount Required</label>
+                            <input type="text" class="form-control" id="totalAmountRequired" value="0" disabled>
                         </div>
                         <div id="message" class="error-message"></div>
                         <button class="btn btn-custom" onclick="confirmOrder()">Confirm the Order</button>
@@ -111,6 +110,16 @@
     </div>
 
     <script>
+        function updateTotalAmount() {
+            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const totalAmount = currentPrice * quantity;
+
+            document.getElementById('totalAmountRequired').value = totalAmount.toFixed(2);
+        }
+        document.getElementById("quantity").addEventListener("change",()=>{
+            updateTotalAmount();
+        })
         let userBalance = 5000; // This should be fetched from the server for the logged-in user
 
         function selectExpiry(time) {
