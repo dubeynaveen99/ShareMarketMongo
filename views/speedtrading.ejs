@@ -27,23 +27,8 @@
         .btn-custom:hover {
             background-color: #218838;
         }
-        .quantity-options button {
-            margin-top: 10px;
-            width: 100px;
-        }
-        .expiry-options button {
-            margin-right: 5px;
-        }
-        .input-field {
-            width: 100%;
-            padding: 5px;
-        }
         .error-message {
             color: red;
-            margin-top: 10px;
-        }
-        .processing-message {
-            color: blue;
             margin-top: 10px;
         }
         .success-message {
@@ -51,7 +36,6 @@
             margin-top: 10px;
         }
     </style>
-   
 </head>
 <body>
     <div class="container">
@@ -76,10 +60,6 @@
                             <input type="text" class="form-control" id="currentPrice" value="5700" disabled>
                         </div>
                         <div class="form-group">
-                            <label>Transaction Mode</label>
-                            <span class="badge badge-light text-dark">USDT</span>
-                        </div>
-                        <div class="form-group">
                             <label>Choose expiry time (slide left for more options)</label>
                             <div class="expiry-options">
                                 <button class="btn btn-outline-light" onclick="selectExpiry(60)">60S</button>
@@ -87,15 +67,15 @@
                                 <button class="btn btn-outline-light" onclick="selectExpiry(180)">180S</button>
                                 <button class="btn btn-outline-light" onclick="selectExpiry(240)">240S</button>
                             </div>
-                            <input type="hidden" id="expiryTime" value="120">
+                            <input type="hidden" id="expiryTime" value="60">
                         </div>
                         <div class="form-group">
                             <label for="quantity">Quantity to buy</label>
                             <input type="text" class="form-control mt-3 input-field" id="quantity" value="1000">
                         </div>
                         <div class="form-group">
-                            <label>Available Balance:<%= user.balance %></label>
-                            <span id="availableBalance"></span>
+                            <label>Available Balance</label>
+                            <span id="availableBalance"><%= user.balance %></span>
                         </div>
                         <div class="form-group">
                             <label>Total Amount Required</label>
@@ -110,31 +90,26 @@
     </div>
 
     <script>
+        let userBalance = parseFloat(document.getElementById('availableBalance').innerHTML); // Convert balance to float
+        function selectExpiry(seconds) {
+            document.getElementById('expiryTime').value = seconds;
+            // Optional: Provide feedback to the user
+            document.getElementById('message').innerText = `Expiry time set to ${seconds} seconds.`;
+        }
         function updateTotalAmount() {
             const currentPrice = parseFloat(document.getElementById('currentPrice').value);
             const quantity = parseInt(document.getElementById('quantity').value);
             const totalAmount = currentPrice * quantity;
-
             document.getElementById('totalAmountRequired').value = totalAmount.toFixed(2);
         }
-        document.getElementById("quantity").addEventListener("change",()=>{
-            updateTotalAmount();
-        })
-        let userBalance = 5000; // This should be fetched from the server for the logged-in user
 
-        function selectExpiry(time) {
-            document.getElementById('expiryTime').value = time;
-        }
+        // Update total amount on page load and whenever quantity changes
+        updateTotalAmount();
+        document.getElementById("quantity").addEventListener("change", updateTotalAmount);
 
-        function selectQuantity(amount) {
-            document.getElementById('quantity').value = amount;
-        }
-
-        function confirmOrder() {
+        async function confirmOrder() {
             const currentPrice = parseFloat(document.getElementById('currentPrice').value);
             const quantity = parseInt(document.getElementById('quantity').value);
-            const expiryTime = parseInt(document.getElementById('expiryTime').value);
-            const direction = document.getElementById('direction').value;
             const totalCost = currentPrice * quantity;
 
             const messageElement = document.getElementById('message');
@@ -148,53 +123,45 @@
                 return;
             }
 
-            // If balance is sufficient, show processing message
-            messageElement.className = 'processing-message';
-            messageElement.innerText = 'Processing your order...';
-
             // Deduct the order amount from the user's balance
             userBalance -= totalCost;
-            document.getElementById('availableBalance').innerText = userBalance + ' USDT';
+            document.getElementById('availableBalance').innerText = userBalance.toFixed(2) + ' USDT';
 
-            setTimeout(() => {
-                // After expiry time, increase balance by 20% of the order amount
-                const incrementAmount = totalCost * 0.2;
-                userBalance += incrementAmount;
-                document.getElementById('availableBalance').innerText = userBalance + ' USDT';
-
-                // Update the balance in the database
-                updateUserBalance(userBalance).then(() => {
-                    // Show success message and navigation option
-                    messageElement.className = 'success-message';
-                    messageElement.innerHTML = 'Order successful! Your new balance is ' + userBalance + ' USDT.<br><button class="btn btn-primary mt-3" onclick="goToDashboard()">Go to Dashboard</button>';
-                });
-            }, expiryTime * 1000);
+            // Update the backend
+            try {
+                await updateInvestedAndCurrentAmount(totalCost);
+                messageElement.className = 'success-message';
+                messageElement.innerText = 'Order successful! Your new balance is ' + userBalance.toFixed(2) + ' INR.';
+            } catch (error) {
+                messageElement.className = 'error-message';
+                messageElement.innerText = 'Failed to place the order.';
+            }
         }
 
-        async function updateUserBalance(balance) {
+        async function updateInvestedAndCurrentAmount(amount) {
             try {
-                const response = await fetch('/update-balance', {
+                const response = await fetch('/update-investment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ balance }),
+                    body: JSON.stringify({
+                        investedAmount: amount,
+                        currentAmount: amount,
+                        userBalance: userBalance
+                    }),
                 });
                 if (!response.ok) {
-                    throw new Error('Failed to update balance');
+                    throw new Error('Failed to update investment');
                 }
             } catch (error) {
                 console.error('Error:', error);
+                throw error;
             }
-        }
-
-        function goToDashboard() {
-            window.location.href = '/dashboard';
         }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -6,7 +6,8 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     balance: { type: Number, default: 1000000},
-    investedAmount:{type:Number,default:0}
+    investedAmount:{type:Number,default:0},
+    currentAmount:{type:Number,default:0}
 });
 // Hash the password before saving
 UserSchema.pre('save', async function(next) {

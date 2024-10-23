@@ -130,6 +130,31 @@ app.post('/add-wallet',auth, async (req, res) => {
     }
 });
 
+// Route for updating the investment
+app.post('/update-investment', auth, async (req, res) => {
+    const { investedAmount, currentAmount, userBalance } = req.body;
+    const userId = req.user.id;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Update the user's balance, investedAmount, and currentAmount
+        user.balance = userBalance;
+        user.investedAmount += investedAmount;
+        user.currentAmount = currentAmount;
+
+        // Save the updated user data to MongoDB
+        await user.save();
+
+        res.status(200).json({ success: true, message: 'Investment updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Error updating investment' });
+    }
+});
 
 // Start server
 const PORT = process.env.PORT || 3000;
