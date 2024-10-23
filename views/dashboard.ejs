@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcST4I6PixzJfHfDxc0rKrWLzJN7YVo3RfhTCA&s');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+        }
+        .dashboard-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            border: none;
+            margin-top: 30px;
+        }
+        .price-change {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .gain {
+            color: green;
+        }
+        .loss {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="dashboard-header text-center">
+            <h1 class="text-success">Welcome, <%= user.username %>!</h1>
+            <div class="text-warning">Current Wallet Balance:<%= user.balance %></div>
+        </div>
+        
+
+        
+        
+        <div class="card dashboard-card">
+            <div class="card-body">
+                <h3 class="card-title">Share Dashboard</h3>
+                <button onclick="window.location.href='/speedtrading'" class="btn btn-primary mt-3">Speed Trading</button>
+                <table class="table table-dark table-hover mt-4">
+                    <thead>
+                        <tr>
+                            <th>Share Name</th>
+                            <th>Today's Price</th>
+                            <th>Today's High</th>
+                            <th>Change</th>
+                            <th>Percentage Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="share-table">
+                        <!-- Sample records will be populated here using JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for 10 shares
+        const sharesData = [
+            { name: 'ABC Corp', todayPrice: 120, todayHigh: 130, previousClose: 115 },
+            { name: 'XYZ Ltd', todayPrice: 95, todayHigh: 100, previousClose: 98 },
+            { name: 'Tech Innovations', todayPrice: 210, todayHigh: 215, previousClose: 200 },
+            { name: 'Green Energy', todayPrice: 75, todayHigh: 78, previousClose: 80 },
+            { name: 'Fast Movers', todayPrice: 135, todayHigh: 140, previousClose: 130 },
+            { name: 'Digital Solutions', todayPrice: 50, todayHigh: 55, previousClose: 45 },
+            { name: 'Finance Hub', todayPrice: 160, todayHigh: 165, previousClose: 158 },
+            { name: 'Health Plus', todayPrice: 88, todayHigh: 90, previousClose: 85 },
+            { name: 'Travel World', todayPrice: 45, todayHigh: 48, previousClose: 50 },
+            { name: 'Foodies Inc', todayPrice: 120, todayHigh: 125, previousClose: 122 }
+        ];
+
+        // Populate the table with sample data
+        const shareTable = document.getElementById('share-table');
+        sharesData.forEach(share => {
+            const change = share.todayPrice - share.previousClose;
+            const percentageChange = ((change / share.previousClose) * 100).toFixed(2);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${share.name}</td>
+                <td>$${share.todayPrice}</td>
+                <td>$${share.todayHigh}</td>
+                <td class="price-change ${change > 0 ? 'gain' : 'loss'}">
+                    ${change > 0 ? '+' : ''}${change.toFixed(2)}
+                </td>
+                <td class="price-change ${change > 0 ? 'gain' : 'loss'}">
+                    ${change > 0 ? '+' : ''}${percentageChange}%
+                </td>
+            `;
+            shareTable.appendChild(row);
+        });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
