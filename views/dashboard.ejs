@@ -28,6 +28,13 @@
         .loss {
             color: red;
         }
+        #message {
+            display: none; /* Initially hidden */
+            background-color: #f0f0f0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -39,7 +46,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">Profile</a>
+                    <a class="nav-link text-success" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="#">Transaction History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="/dashboard">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="/logout">Logout</a>
@@ -47,6 +60,8 @@
             </ul>
         </div>
     </nav>
+
+    <div id="message" class=" container-fluid text-success">Your current profitable amount is: <span id="value"><%= user.currentAmount %> INR for investment of <%= user.investedAmount %> INR </span></div>
     <div class="container mt-5">   
         <div class="card dashboard-card">
             <div class="card-body">
@@ -72,6 +87,16 @@
     </div>
 
     <script>
+         window.onload = function() {
+            // Show the message div
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'block';
+
+            // Hide the message after 5 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 8000); // 5000 milliseconds = 5 seconds
+        };
         // Sample data for 10 shares
         const sharesData = [
             { name: 'Amazon', todayPrice: 120, todayHigh: 130, previousClose: 115 },

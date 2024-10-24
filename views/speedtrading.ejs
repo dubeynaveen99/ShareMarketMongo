@@ -109,7 +109,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile">Profile</a>
+                    <a class="nav-link text-success" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="#">Transaction History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="/dashboard">Home</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-danger" href="/logout">Logout</a>
@@ -139,10 +145,6 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="currentPrice">Current Price</label>
-                            <input type="text" class="form-control" id="currentPrice" value="5700" disabled>
-                        </div>
-                        <div class="form-group">
                             <label>Choose expiry time</label>
                             <div class="expiry-options">
                                 <button class="btn btn-outline-light" onclick="selectExpiry(60)">60S</button>
@@ -152,15 +154,15 @@
                         </div>
                         <div class="form-group">
                             <label for="quantity">Quantity to buy</label>
-                            <input type="text" class="form-control mt-3 input-field" id="quantity" value="1000">
+                            <input type="number" class="form-control mt-3 input-field" id="quantity" value="">
                         </div>
                         <div class="form-group">
                             <label>Available Balance</label>
                             <span id="availableBalance"><%= user.balance %></span>
                         </div>
                         <div class="form-group">
-                            <label>Total Amount Required</label>
-                            <input type="text" class="form-control" id="totalAmountRequired" value="0" disabled>
+                            <label>Amount</label>
+                            <input type="number" class="form-control" id="totalAmountRequired" value="">
                         </div>
                         <div id="message" class="error-message"></div>
                         <button class="btn btn-custom"  onclick="openModal(),confirmOrder()">Confirm the Order</button>
@@ -172,7 +174,7 @@
         <div id="timerModal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" onclick="closeModal()">&times;</span>
-                <h3>BTC</h3>
+                <h3 class="text-warning">Processing in</h3>
                 <div id="circleTimer" class="circle-timer">60</div>
             </div>
         </div>
@@ -204,7 +206,7 @@
             timerElement.textContent = time;
             if (time <= 0) {
                 clearInterval(timerInterval);
-                alert("Time's up!");
+                alert("Time's Up,You will be navigated to dashboard");
             }
         }, 1000);
     }
@@ -222,20 +224,16 @@
             document.getElementById('message').innerText = `Expiry time set to ${seconds} seconds.`;
         }
         function updateTotalAmount() {
-            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const totalAmount = currentPrice * quantity;
+            const totalAmount = document.getElementById('totalAmountRequired').value;
             document.getElementById('totalAmountRequired').value = totalAmount.toFixed(2);
         }
 
         // Update total amount on page load and whenever quantity changes
         updateTotalAmount();
-        document.getElementById("quantity").addEventListener("change", updateTotalAmount);
+        document.getElementById("totalAmountRequired").addEventListener("change", updateTotalAmount);
 
         async function confirmOrder() {      
-            const currentPrice = parseFloat(document.getElementById('currentPrice').value);
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const totalCost = currentPrice * quantity;
+            const totalCost = document.getElementById('totalAmountRequired').value;
 
             const messageElement = document.getElementById('message');
             const expiryTime = parseInt(document.getElementById('expiryTime').value);
