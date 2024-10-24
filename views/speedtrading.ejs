@@ -50,6 +50,54 @@
             color: green;
             margin-top: 10px;
         }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+        .circle-timer {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #4a6cf7;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            margin: 20px auto;
+        }
+        .close-btn {
+            cursor: pointer;
+            float: right;
+            font-size: 18px;
+        }
+        #go-on-btn {
+            background-color: #00c853;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hide-content {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -70,9 +118,8 @@
         </div>
     </nav>
    
-    <div class="container">
-       
-        <div class="row justify-content-center">
+    <div class="container">   
+        <div id="mainContent" class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card order-confirmation-card">
                     <div id="spinner" class="spinner"></div>
@@ -96,12 +143,10 @@
                             <input type="text" class="form-control" id="currentPrice" value="5700" disabled>
                         </div>
                         <div class="form-group">
-                            <label>Choose expiry time (slide left for more options)</label>
+                            <label>Choose expiry time</label>
                             <div class="expiry-options">
                                 <button class="btn btn-outline-light" onclick="selectExpiry(60)">60S</button>
                                 <button class="btn btn-outline-light" onclick="selectExpiry(120)">120S</button>
-                                <button class="btn btn-outline-light" onclick="selectExpiry(180)">180S</button>
-                                <button class="btn btn-outline-light" onclick="selectExpiry(240)">240S</button>
                             </div>
                             <input type="hidden" id="expiryTime" value="60">
                         </div>
@@ -118,14 +163,58 @@
                             <input type="text" class="form-control" id="totalAmountRequired" value="0" disabled>
                         </div>
                         <div id="message" class="error-message"></div>
-                        <button class="btn btn-custom"  onclick="confirmOrder()">Confirm the Order</button>
+                        <button class="btn btn-custom"  onclick="openModal(),confirmOrder()">Confirm the Order</button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="timerModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <h3>BTC</h3>
+                <div id="circleTimer" class="circle-timer">60</div>
             </div>
         </div>
     </div>
 
     <script>
+        let timerInterval;
+
+        function openModal() {
+            document.getElementById("mainContent").classList.add("hide-content");
+            document.getElementById("timerModal").style.display = "flex";
+            const expiryTime = parseInt(document.getElementById('expiryTime').value);
+            startTimer(expiryTime);
+        }
+
+        function closeModal() {
+            document.getElementById("mainContent").classList.remove("hide-content");
+            document.getElementById("timerModal").style.display = "none";
+            clearInterval(timerInterval);
+        }
+
+        function startTimer(duration) {
+            let time = duration;
+            const timerElement = document.getElementById("circleTimer");
+            timerElement.textContent = time;
+
+        timerInterval = setInterval(() => {
+            time--;
+            timerElement.textContent = time;
+            if (time <= 0) {
+                clearInterval(timerInterval);
+                alert("Time's up!");
+            }
+        }, 1000);
+    }
+
+    function selectExpiry(seconds) {
+        document.getElementById('expiryTime').value = seconds;
+    }
+
+
+
         let userBalance = parseFloat(document.getElementById('availableBalance').innerHTML); // Convert balance to float
         function selectExpiry(seconds) {
             document.getElementById('expiryTime').value = seconds;
