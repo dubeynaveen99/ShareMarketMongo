@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light background color */
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .table th {
+            background-color: #343a40; /* Dark header background */
+            color: white; /* White text color */
+        }
+        .table td {
+            vertical-align: middle;
+        }
+        .profit {
+            color: green; /* Profit in green */
+        }
+        .loss {
+            color: red; /* Loss in red */
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="/transaction">Transaction History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-success" href="/dashboard">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Transaction History</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Transaction Amount</th>
+                        <th>Current Profitable Amount</th>
+                        <th>Percentage Gain/Loss</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>INR <%= user.investedAmount %></td>
+                        <td>INR <%= user.currentAmount %></td>
+                        <td class="profit">20%</td>
+                    </tr>
+                    <tr>
+                        <td>INR 500</td>
+                        <td>INR 450</td>
+                        <td class="loss">-10%</td>
+                    </tr>
+                    <tr>
+                        <td>INR 3000</td>
+                        <td>INR 3300</td>
+                        <td class="profit">10%</td>
+                    </tr>
+                    <tr>
+                        <td>INR 2500</td>
+                        <td>INR 2400</td>
+                        <td class="loss">-4%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and dependencies (jQuery, Popper.js) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

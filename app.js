@@ -36,6 +36,7 @@ const dashboardRoutes = require('./routes/dashboard');
 const speedtradingRoutes=require('./routes/speedtrading');
 const addWalletRoutes = require('./routes/add-wallet');
 const profileRoutes=require('./routes/profile');
+const transactionRoutes=require('./routes/transaction');
 
 // Use Routes
 app.use('/', indexRoutes);
@@ -44,6 +45,7 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/speedtrading',speedtradingRoutes);
 app.use('/add-wallet', addWalletRoutes);
 app.use('/profile',profileRoutes);
+app.use('/transaction',transactionRoutes);
 
 // User registration and login routes
 app.get('/register', (req, res) => {
